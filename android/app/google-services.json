@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "440685749921",
+    "project_id": "unibites-69b26",
+    "storage_bucket": "unibites-69b26.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:440685749921:android:db2358824d69a62138b2e0",
+        "android_client_info": {
+          "package_name": "com.unibites.unibitesapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB5hk8fUA1f2m3cp1rsVAylWCxWSHs1rWI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

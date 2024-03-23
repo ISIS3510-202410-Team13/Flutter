@@ -1,8 +1,10 @@
 
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-
+import 'package:test_drive/body.dart';
 import 'mapView.dart';
+
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key, required this.title});
@@ -26,6 +28,34 @@ class _LoginPageState extends State<LoginPage> {
   String _user = "";
   String _pass = ""; 
 
+
+  
+  final _formkey= GlobalKey<FormState>();
+
+  TextEditingController useremailcontroller = new TextEditingController();
+  TextEditingController userpasswordcontroller = new TextEditingController();
+
+    userLogin() async {
+    try {
+      await FirebaseAuth.instance
+          .signInWithEmailAndPassword(email: _user, password: _pass);
+          Navigator.push(context, MaterialPageRoute(builder: (context)=> const MapView()));
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'user-not-found') {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text(
+          "No User Found for that Email",
+          style: TextStyle(fontSize: 18.0, color: Colors.black),
+        )));
+      }else if(e.code=='wrong-password'){
+         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text(
+          "Wrong Password Provided by User",
+          style: TextStyle(fontSize: 18.0, color: Colors.black),
+        )));
+      }
+    }
+  }
   /*void _incrementCounter() {
     setState(() {
       // This call to setState tells the Flutter framework that something has
@@ -36,7 +66,7 @@ class _LoginPageState extends State<LoginPage> {
       _counter++;
     });
   }*/
-
+  
   @override
   Widget build(BuildContext context) {
     // This method is rerun every time setState is called, for instance as done
@@ -74,6 +104,7 @@ class _LoginPageState extends State<LoginPage> {
         padding: const EdgeInsets.symmetric(horizontal: 16),
         child: Center(
           child: Column(
+            key: _formkey,
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               const Text(
@@ -85,18 +116,34 @@ class _LoginPageState extends State<LoginPage> {
               ),
               
               const SizedBox(height: 16),
-              const Padding(
+               Padding(
                 padding: EdgeInsets.symmetric(vertical: 8),
-                child: TextField(
+                child: TextFormField(
+                  controller: useremailcontroller,
+                  validator: (value){
+                    if(value==null || value.isEmpty){
+                      return "Please Enter Email";
+                    }
+                    return null;
+                  
+                  },
                   decoration: InputDecoration(
                     border: OutlineInputBorder(),
                     labelText: 'Correo Electrónico',
                   ),
                 ),
               ),
-              const Padding(
+               Padding(
                 padding: EdgeInsets.symmetric(vertical: 8),
-                child: TextField(
+                child: TextFormField(
+                  controller: userpasswordcontroller,
+                  validator: (value){
+                    if(value==null || value.isEmpty){
+                      return "Please Enter Email";
+                    }
+                    return null;
+                  
+                  },
                   decoration: InputDecoration(
                     border: OutlineInputBorder(),
                     labelText: 'Contraseña',
@@ -120,7 +167,7 @@ class _LoginPageState extends State<LoginPage> {
                       onPressed: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => const MapView()),
+                          MaterialPageRoute(builder: (context) =>  HomeScreen()),
                         );
                       },
                       style: ElevatedButton.styleFrom(
