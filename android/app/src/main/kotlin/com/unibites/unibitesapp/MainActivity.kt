@@ -1,4 +1,4 @@
-package com.example.test_drive
+package com.unibites.unibitesapp
 
 import io.flutter.embedding.android.FlutterActivity
 
