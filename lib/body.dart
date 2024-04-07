@@ -94,7 +94,7 @@ class HomeScreen extends StatelessWidget {
                 stream: FirebaseFirestore.instance.collection('veganrestaurants').snapshots(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return CircularProgressIndicator(); // Muestra un indicador de carga mientras se cargan los datos
+                    return CircularProgressIndicator();
                   }
                   if (snapshot.hasError) {
                     return Text('Error al obtener los datos: ${snapshot.error}');

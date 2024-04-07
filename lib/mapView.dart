@@ -75,7 +75,7 @@ class _MapViewState extends State<MapView> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: const Center(child: Text("U. De Los Andes")),
+        title: const Center(child: Text("U. de los Andes")),
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.menu),
