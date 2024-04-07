@@ -88,7 +88,7 @@ class RestaurantCarousel extends StatelessWidget {
                           // Aquí puedes implementar la navegación al mapa o cualquier acción que desees
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => MapView()),
+                            MaterialPageRoute(builder: (context) => MapView(lat: restaurant.lat, long: restaurant.long,)),
                           );
                         },
                         child: Text('Ver en el mapa'),
