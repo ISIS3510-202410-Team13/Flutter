@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:test_drive/mapView.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
-import 'login.dart';
+//import 'login.dart';
+import 'package:test_drive/user_auth/pages/login_auth.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -40,7 +41,8 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFFf97a07)),
         useMaterial3: true,
       ),
-      home: const LoginPage(title: 'Flutter Demo Home Page'),
+      //home: const LoginPage(title: 'Flutter Demo Home Page'),
+      home: const LoginPage(),
     );
   }
 }
