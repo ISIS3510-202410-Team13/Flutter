@@ -2,11 +2,20 @@ import 'dart:async';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:firebase_database/firebase_database.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 
 class MapView extends StatefulWidget {
   
-  const MapView({Key? key}) : super(key: key);
+  const MapView({
+    Key? key, 
+    required this.lat,
+    required this.long,
+    }) : super(key: key);
+
+  final double lat;
+  final double long;
 
   @override
   State<MapView> createState() => _MapViewState();
@@ -17,7 +26,13 @@ class _MapViewState extends State<MapView> {
   
   Completer<GoogleMapController> _controller = Completer();
 
-  static const LatLng _center = LatLng(4.6029286, -74.0653713);
+  LatLng? _center;
+
+  @override
+  void initState() {
+    super.initState();
+    _center = LatLng(widget.lat, widget.long);
+  }
 
   Future<Position> getUserCurrentLocation() async {
 
@@ -86,7 +101,7 @@ class _MapViewState extends State<MapView> {
                 onMapCreated: (GoogleMapController controller){
                   _controller.complete(controller);
                   () async {
-                    final Position position = await getUserCurrentLocation();
+                    final Position position = LatLng(0, 0) as Position;
                     controller.animateCamera(CameraUpdate.newCameraPosition(
                       CameraPosition(
                         target: LatLng(position.latitude, position.longitude),
@@ -96,9 +111,15 @@ class _MapViewState extends State<MapView> {
                   };
                 },
                 initialCameraPosition: CameraPosition(
-                  target: _center,
+                  target: _center!,
                   zoom: 19.0,
                 ),
+                markers: {
+                   Marker(
+                    markerId: MarkerId("U. De Los Andes"),
+                    position: LatLng(_center!.latitude, _center!.longitude),
+                   )
+                },
               ),
             ),
           ],
