@@ -20,11 +20,15 @@ class HomeScreen extends StatelessWidget {
       name: "Toninos Pasta",
       imageUrl: "https://images.rappi.com/restaurants_logo/formevfdgfxato-logo-1614191489436.png",
       description: "Pastas unicas y deliciosas.",
+      lat: 0,
+      long: 0,
     ),
     Restaurant(
       name: "OneBurrito",
       imageUrl: "https://images.rappi.com/restaurants_logo/oneburrito-logo-1614191489436.png",
       description: "Comida mexicana, tacos y burritos, siempre a la orden del dia.",
+      lat: 0,
+      long: 0,
     ),
     // Agrega más restaurantes según lo necesites
   ];
@@ -76,6 +80,8 @@ class HomeScreen extends StatelessWidget {
                       name: doc['name'],
                       imageUrl: doc['url'],
                       description: doc['description'],
+                      lat: doc['lat'],
+                      long: doc['long'],
                     );
                   }).toList();
                   return RestaurantCarousel(restaurants: restaurants);
@@ -98,6 +104,8 @@ class HomeScreen extends StatelessWidget {
                       name: doc['name'],
                       imageUrl: doc['url'],
                       description: doc['description'],
+                      lat: 0,
+                      long: 0,
                     );
                   }).toList();
                   return RestaurantCarousel(restaurants: restaurants);
