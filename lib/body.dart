@@ -85,7 +85,7 @@ class HomeScreen extends StatelessWidget {
                     text: "Opciones veganas",
                   ),
                 StreamBuilder<QuerySnapshot>(
-                stream: FirebaseFirestore.instance.collection('restaurants').snapshots(),
+                stream: FirebaseFirestore.instance.collection('veganrestaurants').snapshots(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return CircularProgressIndicator(); // Muestra un indicador de carga mientras se cargan los datos

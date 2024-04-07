@@ -67,12 +67,14 @@ class RestaurantCarousel extends StatelessWidget {
                       ),
                     ),
                     // Descripción del restaurante
-                    Padding(
+                    Flexible(
+                    child: Padding(
                       padding: EdgeInsets.symmetric(horizontal: 8.0),
                       child: Text(
                         restaurant.description,
-                        style: TextStyle(fontSize: 14.0),
+                        style: TextStyle(fontSize: 13.0),
                       ),
+                    )
                     ),
                     // Botón para ver el restaurante en el mapa
                     Padding(
