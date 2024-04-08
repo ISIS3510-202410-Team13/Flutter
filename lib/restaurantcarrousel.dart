@@ -9,11 +9,19 @@ class Restaurant {
   final String name;
   final String imageUrl;
   final String description;
+  final double lat;
+  final double long;
+  final String type;
+  final String price;
 
   Restaurant({
     required this.name,
     required this.imageUrl,
     required this.description,
+    required this.lat,
+    required this.long,
+    required this.type,
+    required this.price,
   });
 }
 
