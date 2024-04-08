@@ -11,6 +11,9 @@ class Restaurant {
   final String description;
   final double lat;
   final double long;
+  final String type;
+  final String price;
+
 
   Restaurant({
     required this.name,
@@ -18,6 +21,9 @@ class Restaurant {
     required this.description,
     required this.lat,
     required this.long,
+    required this.type,
+    required this.price,
+
   });
 }
 
