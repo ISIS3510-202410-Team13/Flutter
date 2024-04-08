@@ -14,6 +14,7 @@ class Restaurant {
   final String type;
   final String price;
 
+
   Restaurant({
     required this.name,
     required this.imageUrl,
@@ -22,6 +23,7 @@ class Restaurant {
     required this.long,
     required this.type,
     required this.price,
+
   });
 }
 
@@ -92,7 +94,7 @@ class RestaurantCarousel extends StatelessWidget {
                           // Aquí puedes implementar la navegación al mapa o cualquier acción que desees
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => MapView()),
+                            MaterialPageRoute(builder: (context) => MapView(lat: restaurant.lat, long: restaurant.long,)),
                           );
                         },
                         child: Text('Ver en el mapa'),
