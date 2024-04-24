@@ -1,5 +1,3 @@
-// ignore_for_file: override_on_non_overriding_member
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:random_string/random_string.dart';
@@ -174,4 +172,3 @@ class _SignUpPageState extends State<SignUpPage> {
     );
   }
 }
-

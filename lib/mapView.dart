@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
+import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 
 class MapView extends StatefulWidget {
   
@@ -28,10 +28,15 @@ class _MapViewState extends State<MapView> {
 
   LatLng? _center;
 
+  Map<PolylineId, Polyline> polylines = {};
+
+  late Future<Position> _currentPosition;
+
   @override
   void initState() {
     super.initState();
     _center = LatLng(widget.lat, widget.long);
+    _currentPosition = getUserCurrentLocation();
   }
 
   Future<Position> getUserCurrentLocation() async {
@@ -65,10 +70,65 @@ class _MapViewState extends State<MapView> {
       'Location permissions are permanently denied, we cannot request permissions.');
   } 
 
-  // When we reach here, permissions are granted and we can
-  // continue accessing the position of the device.
-  return await Geolocator.getCurrentPosition();
-}
+    // When we reach here, permissions are granted and we can
+    // continue accessing the position of the device.
+    return await Geolocator.getCurrentPosition();
+  }
+
+    Future<List<LatLng>> fetchPolylinePoints() async {
+    final polylinePoints = PolylinePoints();
+
+    final result = await polylinePoints.getRouteBetweenCoordinates(
+      "AIzaSyAl1qbz6VmRsbbc5bbMUZAvUeNWRG9ofic",
+      PointLatLng(4.6025061, -74.066107),
+      PointLatLng(widget.lat, widget.long),
+    );
+
+    if (result.points.isNotEmpty) {
+      return result.points
+          .map((point) => LatLng(point.latitude, point.longitude))
+          .toList();
+    } else {
+      debugPrint(result.errorMessage);
+      return [];
+    }
+  }
+
+  Future<void> generatePolyLineFromPoints(
+      List<LatLng> polylineCoordinates) async {
+    const id = PolylineId('polyline');
+
+    final polyline = Polyline(
+      polylineId: id,
+      color: Colors.blueAccent,
+      points: polylineCoordinates,
+      width: 5,
+    );
+
+    setState(() => polylines[id] = polyline);
+
+    print(polylines);
+    }
+
+  getPolypoints(){
+    //Position current = _currentPosition as Position;
+    LatLng desde = LatLng(4.6025061, -74.066107);
+    LatLng hasta = LatLng(widget.lat, widget.long);
+
+    final Set<Polyline> _polyline = {};
+
+    _polyline.add( 
+      Polyline(
+        polylineId: PolylineId('ruta'),
+        visible: true,
+        points: [desde, hasta],
+        color: Colors.blue,
+        width: 4,
+      )
+    );
+
+  return _polyline;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -97,11 +157,14 @@ class _MapViewState extends State<MapView> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Expanded(
-              child: GoogleMap( 
-                onMapCreated: (GoogleMapController controller){
+              child: GoogleMap(
+                polylines: polylines.values.toSet(),
+                myLocationEnabled: true,
+                myLocationButtonEnabled: true,
+                onMapCreated: (GoogleMapController controller) {
                   _controller.complete(controller);
                   () async {
-                    final Position position = LatLng(0, 0) as Position;
+                    final Position position = getUserCurrentLocation() as Position;
                     controller.animateCamera(CameraUpdate.newCameraPosition(
                       CameraPosition(
                         target: LatLng(position.latitude, position.longitude),

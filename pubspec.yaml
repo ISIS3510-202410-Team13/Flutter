@@ -50,6 +50,9 @@ dependencies:
   fluttertoast: ^8.2.4
   geolocator: ^9.0.2
   permission_handler: ^11.3.0
+  flutter_polyline_points: ^2.0.0
+  connectivity_plus: ^2.0.0
+  shared_preferences: ^2.2.3
 
 dev_dependencies:
   flutter_test:
