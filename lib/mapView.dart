@@ -6,24 +6,22 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 
+
 class MapView extends StatefulWidget {
-  
   const MapView({
-    Key? key, 
+    Key? key,
     required this.lat,
     required this.long,
-    }) : super(key: key);
+  }) : super(key: key);
 
   final double lat;
   final double long;
 
   @override
   State<MapView> createState() => _MapViewState();
-
 }
 
 class _MapViewState extends State<MapView> {
-  
   Completer<GoogleMapController> _controller = Completer();
 
   LatLng? _center;
@@ -40,36 +38,35 @@ class _MapViewState extends State<MapView> {
   }
 
   Future<Position> getUserCurrentLocation() async {
-
     bool serviceEnabled;
     LocationPermission permission;
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
- if (!serviceEnabled) {
-    // Location services are not enabled don't continue
-    // accessing the position and request users of the 
-    // App to enable the location services.
-    return Future.error('Location services are disabled.');
-  }
-
-  permission = await Geolocator.checkPermission();
-  if (permission == LocationPermission.denied) {
-    permission = await Geolocator.requestPermission();
-    if (permission == LocationPermission.denied) {
-      // Permissions are denied, next time you could try
-      // requesting permissions again (this is also where
-      // Android's shouldShowRequestPermissionRationale 
-      // returned true. According to Android guidelines
-      // your App should show an explanatory UI now.
-      return Future.error('Location permissions are denied');
+    if (!serviceEnabled) {
+      // Location services are not enabled don't continue
+      // accessing the position and request users of the
+      // App to enable the location services.
+      return Future.error('Location services are disabled.');
     }
-  }
-  
-  if (permission == LocationPermission.deniedForever) {
-    // Permissions are denied forever, handle appropriately. 
-    return Future.error(
-      'Location permissions are permanently denied, we cannot request permissions.');
-  } 
 
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        // Permissions are denied, next time you could try
+        // requesting permissions again (this is also where
+        // Android's shouldShowRequestPermissionRationale
+        // returned true. According to Android guidelines
+        // your App should show an explanatory UI now.
+        return Future.error('Location permissions are denied');
+      }
+    }
+
+
+    if (permission == LocationPermission.deniedForever) {
+      // Permissions are denied forever, handle appropriately.
+      return Future.error(
+          'Location permissions are permanently denied, we cannot request permissions.');
+    }
     // When we reach here, permissions are granted and we can
     // continue accessing the position of the device.
     return await Geolocator.getCurrentPosition();
@@ -152,13 +149,13 @@ class _MapViewState extends State<MapView> {
           ),
         ],
       ),
-      body:  Center(
+      body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Expanded(
               child: GoogleMap(
-                polylines: polylines.values.toSet(),
+             polylines: polylines.values.toSet(),
                 myLocationEnabled: true,
                 myLocationButtonEnabled: true,
                 onMapCreated: (GoogleMapController controller) {
@@ -178,10 +175,10 @@ class _MapViewState extends State<MapView> {
                   zoom: 19.0,
                 ),
                 markers: {
-                   Marker(
+                  Marker(
                     markerId: MarkerId("U. De Los Andes"),
                     position: LatLng(_center!.latitude, _center!.longitude),
-                   )
+                  )
                 },
               ),
             ),
@@ -191,6 +188,3 @@ class _MapViewState extends State<MapView> {
     );
   }
 }
-
-
-
