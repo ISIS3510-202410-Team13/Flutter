@@ -22,6 +22,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   FilterOptions selectedFilters = FilterOptions(type: 'ALL', price: '');
 
+
   final List<Restaurant> restaurants = [
     Restaurant(
       name: "Toninos Pasta",

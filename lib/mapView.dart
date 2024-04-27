@@ -69,8 +69,7 @@ class _MapViewState extends State<MapView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        
-        backgroundColor: Color.fromARGB(255, 243, 212, 33),
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: const Center(child: Text("U. de los Andes")),
         centerTitle: true,
         leading: IconButton(
