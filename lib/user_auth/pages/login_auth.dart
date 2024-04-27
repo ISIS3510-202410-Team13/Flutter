@@ -101,7 +101,6 @@ void _signInWithEmailAndPassword({required String email, required String passwor
     showToast(message: "Some error occurred");
   }
 }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(

@@ -14,6 +14,7 @@ class Restaurant {
   final String type;
   final String price;
 
+
   Restaurant({
     required this.name,
     required this.imageUrl,
@@ -22,6 +23,7 @@ class Restaurant {
     required this.long,
     required this.type,
     required this.price,
+
   });
 }
 
