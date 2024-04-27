@@ -16,7 +16,6 @@ import 'package:local_auth/local_auth.dart';
 import 'dart:io';
 
 
-
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
@@ -35,7 +34,6 @@ class _LoginPageState extends State<LoginPage> {
 
   bool userHasTouchId = false;
   bool _useTouchId = false;
-
 
 
   @override
@@ -141,7 +139,6 @@ void _signInWithEmailAndPassword({required String email, required String passwor
     await prefs.remove("passwordRegistro");
     
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -378,40 +375,6 @@ void _signIn() async {
     showToast(message: "Some error occurred");
   }
 }
-
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  void _signIn() async {
-    setState(() {
-      _isSigning = true;
-    });
-
-    String email = _emailController.text;
-    String password = _passwordController.text;
-
-    User? user = await _auth.signInWithEmailAndPassword(email, password);
-
-    setState(() {
-      _isSigning = false;
-    });
-
-    if (user != null) {
-      showToast(message: "User is successfully signed in");
-      //Navigator.pushNamed(context, "/home");
-            Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) =>  HomeScreen()),
-                        );
-    } else {
-      showToast(message: "some error occured");
-    }
-  }
-
 
   _signInWithGoogle()async{
 

@@ -164,7 +164,6 @@ class _HomeScreenState extends State<HomeScreen> {
                         return RestaurantCarousel(
                             restaurants: restaurants);
                       }),
-
                 ],
               ),
             ),
