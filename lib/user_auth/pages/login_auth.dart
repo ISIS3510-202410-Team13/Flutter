@@ -101,6 +101,7 @@ void _signInWithEmailAndPassword({required String email, required String passwor
     showToast(message: "Some error occurred");
   }
 }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -408,6 +409,7 @@ showToast(message: "some error occured $e");
     print("Can't check biometrics");
   }
 }
+
 
 
 }
