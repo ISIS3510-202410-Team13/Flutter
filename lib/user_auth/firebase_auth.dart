@@ -33,7 +33,7 @@ class FirebaseAuthService {
       if (e.code == 'email-already-in-use') {
         showToast(message: 'The email address is already in use.');
       } else {
-        showToast(message: 'An error occurred: ${e.code}');
+        //showToast(message: 'An error occurred: ${e.code}');
       }
     }
     return null;
