@@ -15,6 +15,7 @@ import 'package:local_auth/local_auth.dart';
 import 'dart:io';
 
 
+
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
@@ -33,6 +34,7 @@ class _LoginPageState extends State<LoginPage> {
 
   bool userHasTouchId = false;
   bool _useTouchId = false;
+
 
 
   @override
@@ -101,6 +103,7 @@ void _signInWithEmailAndPassword({required String email, required String passwor
     showToast(message: "Some error occurred");
   }
 }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -337,6 +340,40 @@ void _signIn() async {
   }
 }
 
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _signIn() async {
+    setState(() {
+      _isSigning = true;
+    });
+
+    String email = _emailController.text;
+    String password = _passwordController.text;
+
+    User? user = await _auth.signInWithEmailAndPassword(email, password);
+
+    setState(() {
+      _isSigning = false;
+    });
+
+    if (user != null) {
+      showToast(message: "User is successfully signed in");
+      //Navigator.pushNamed(context, "/home");
+            Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) =>  HomeScreen()),
+                        );
+    } else {
+      showToast(message: "some error occured");
+    }
+  }
+
+
   _signInWithGoogle()async{
 
     final GoogleSignIn _googleSignIn = GoogleSignIn();
@@ -408,6 +445,7 @@ showToast(message: "some error occured $e");
     print("Can't check biometrics");
   }
 }
+
 
 
 }

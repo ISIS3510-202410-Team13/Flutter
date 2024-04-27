@@ -22,6 +22,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   FilterOptions selectedFilters = FilterOptions(type: 'ALL', price: '');
 
+
   final List<Restaurant> restaurants = [
     Restaurant(
       name: "Toninos Pasta",
@@ -43,6 +44,7 @@ class _HomeScreenState extends State<HomeScreen> {
       long: 0,
       price: "\$",
       type: "ALL",
+
     ),
     // Agrega más restaurantes según lo necesites
   ];
@@ -162,6 +164,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         return RestaurantCarousel(
                             restaurants: restaurants);
                       }),
+
                 ],
               ),
             ),
