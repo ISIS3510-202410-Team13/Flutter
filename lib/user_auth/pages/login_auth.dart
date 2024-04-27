@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:test_drive/body.dart';
 import 'package:test_drive/user_auth/pages/signup_auth.dart';
 import 'package:test_drive/user_auth/pages/login_auth.dart';
@@ -34,6 +35,12 @@ class _LoginPageState extends State<LoginPage> {
   bool userHasTouchId = false;
   bool _useTouchId = false;
 
+
+  @override
+  void initState() {
+    checkCache();
+    super.initState();
+  }
 
   @override
   void dispose() {
@@ -101,6 +108,38 @@ void _signInWithEmailAndPassword({required String email, required String passwor
     showToast(message: "Some error occurred");
   }
 }
+
+  checkCache() async {
+    _auth.signUpWithEmailAndPassword("", "");
+    //showToast(message: "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool? check = prefs.getBool("registroPendiente");
+    if (check != null) {
+      if (!check) {
+        //showToast(message: "No hay registro pendiente.");
+        return;
+      }
+    }
+    String? email = prefs.getString("emailRegistro");
+    String? password = prefs.getString("passwordRegistro");
+    await prefs.setBool("registroPendiente", false);
+
+    if(email == null || email.isEmpty || password == null || password.isEmpty) return;
+
+    //showToast(message: "Registrando...");
+    User? user = await _auth.signUpWithEmailAndPassword(email!, password!);
+
+    if (user != null) {
+      showToast(message: "User is successfully created");
+    } else {
+      showToast(message: "Some error happend");
+    }
+
+    await prefs.remove("emailRegistro");
+    await prefs.remove("passwordRegistro");
+    
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

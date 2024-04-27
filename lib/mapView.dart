@@ -4,6 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_polyline_points/flutter_polyline_points.dart';
+//import 'package:google_map_app/constants.dart';
+import 'package:location/location.dart';
+import 'package:test_drive/location.dart';
 
 class MapView extends StatefulWidget {
   const MapView({
@@ -20,50 +24,33 @@ class MapView extends StatefulWidget {
 }
 
 class _MapViewState extends State<MapView> {
-  Completer<GoogleMapController> _controller = Completer();
-
+  final locationController = Location();
   LatLng? _center;
+  LatLng? currentPosition;
+  Map<PolylineId, Polyline> polylines = {};
+
 
   @override
-  void initState() {
+  void initState()  {
     super.initState();
     _center = LatLng(widget.lat, widget.long);
+    //_currentPosition = getUserCurrentLocation();
+    WidgetsBinding.instance
+        .addPostFrameCallback((_) async => await initializeMap());
   }
 
-  Future<Position> getUserCurrentLocation() async {
-    bool serviceEnabled;
-    LocationPermission permission;
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      // Location services are not enabled don't continue
-      // accessing the position and request users of the
-      // App to enable the location services.
-      return Future.error('Location services are disabled.');
-    }
+    Future<void> initializeMap() async {
+     fetchLocationUpdates();
+    final coordinates = await fetchPolylinePoints();
+    generatePolyLineFromPoints(coordinates);
 
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        // Permissions are denied, next time you could try
-        // requesting permissions again (this is also where
-        // Android's shouldShowRequestPermissionRationale
-        // returned true. According to Android guidelines
-        // your App should show an explanatory UI now.
-        return Future.error('Location permissions are denied');
-      }
-    }
-
-    if (permission == LocationPermission.deniedForever) {
-      // Permissions are denied forever, handle appropriately.
-      return Future.error(
-          'Location permissions are permanently denied, we cannot request permissions.');
-    }
-
-    // When we reach here, permissions are granted and we can
-    // continue accessing the position of the device.
-    return await Geolocator.getCurrentPosition();
   }
+
+
+
+
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -92,21 +79,10 @@ class _MapViewState extends State<MapView> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Expanded(
-              child: GoogleMap(
+              child: currentPosition== null ?
+              const Center(child: Text("Loading")) : GoogleMap(
                 myLocationEnabled: true,
                 myLocationButtonEnabled: true,
-                onMapCreated: (GoogleMapController controller) {
-                  _controller.complete(controller);
-                  () async {
-                    final Position position = LatLng(0, 0) as Position;
-                    controller.animateCamera(CameraUpdate.newCameraPosition(
-                      CameraPosition(
-                        target: LatLng(position.latitude, position.longitude),
-                        zoom: 19.0,
-                      ),
-                    ));
-                  };
-                },
                 initialCameraPosition: CameraPosition(
                   target: _center!,
                   zoom: 19.0,
@@ -115,13 +91,91 @@ class _MapViewState extends State<MapView> {
                   Marker(
                     markerId: MarkerId("U. De Los Andes"),
                     position: LatLng(_center!.latitude, _center!.longitude),
-                  )
+                  ),
+                  Marker(
+                    markerId: MarkerId("currentLocation"),
+                    position: LatLng(currentPosition!.latitude, currentPosition!.longitude),
+                    
+                  ),
                 },
+                polylines: Set<Polyline>.of(polylines.values),
+
               ),
+              
             ),
           ],
         ),
       ),
     );
   }
+
+  Future<void> fetchLocationUpdates() async {
+    bool serviceEnabled;
+    PermissionStatus permissionGranted;
+
+    serviceEnabled = await locationController.serviceEnabled();
+    if (serviceEnabled) {
+      serviceEnabled = await locationController.requestService();
+    } else {
+      return;
+    }
+
+    permissionGranted = await locationController.hasPermission();
+    if (permissionGranted == PermissionStatus.denied) {
+      permissionGranted = await locationController.requestPermission();
+      if (permissionGranted != PermissionStatus.granted) {
+        return;
+      }
+    }
+
+    locationController.onLocationChanged.listen((currentLocation) {
+      if (currentLocation.latitude != null &&
+          currentLocation.longitude != null) {
+        setState(() {
+          currentPosition = LatLng(
+            currentLocation.latitude!,
+            currentLocation.longitude!,
+          );
+        });
+
+              fetchPolylinePoints().then((coordinates) {
+        generatePolyLineFromPoints(coordinates);
+      });
+      }
+    });
+  }
+
+      Future<List<LatLng>> fetchPolylinePoints() async {
+    final polylinePoints = PolylinePoints();
+
+    final result = await polylinePoints.getRouteBetweenCoordinates(
+      "AIzaSyAl1qbz6VmRsbbc5bbMUZAvUeNWRG9ofic",
+      PointLatLng(currentPosition!.latitude, currentPosition!.longitude),
+      PointLatLng(widget.lat, widget.long),
+    );
+
+    if (result.points.isNotEmpty) {
+      return result.points
+          .map((point) => LatLng(point.latitude, point.longitude))
+          .toList();
+    } else {
+      debugPrint(result.errorMessage);
+      return [];
+    }
+  }
+
+    Future<void> generatePolyLineFromPoints(
+      List<LatLng> polylineCoordinates) async {
+    const id = PolylineId('polyline');
+
+    final polyline = Polyline(
+      polylineId: id,
+      color: Colors.blueAccent,
+      points: polylineCoordinates,
+      width: 5,
+    );
+
+    setState(() => polylines[id] = polyline);
+
+    }
 }
