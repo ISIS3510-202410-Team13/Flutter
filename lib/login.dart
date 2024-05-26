@@ -2,7 +2,12 @@
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:test_drive/global/common/toast.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:test_drive/body.dart';
+import 'package:test_drive/main.dart';
+import 'package:test_drive/user_auth/firebase_auth.dart';
 import 'mapView.dart';
 
 
@@ -28,13 +33,19 @@ class _LoginPageState extends State<LoginPage> {
   String _user = "";
   String _pass = ""; 
 
-
+  final FirebaseAuthService _auth = FirebaseAuthService();
   
   final _formkey= GlobalKey<FormState>();
 
   TextEditingController useremailcontroller = new TextEditingController();
   TextEditingController userpasswordcontroller = new TextEditingController();
 
+
+  @override
+  void initState() {
+    checkCache();
+    super.initState();
+  }
     userLogin() async {
     try {
       await FirebaseAuth.instance
@@ -56,17 +67,48 @@ class _LoginPageState extends State<LoginPage> {
       }
     }
   }
-  /*void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
-  }*/
   
+  checkCache() async {
+    _auth.signUpWithEmailAndPassword("", "");
+    showToast(message: "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool? check = prefs.getBool("registroPendiente");
+    if (check != null) {
+      if (!check) {
+        showToast(message: "No hay registro pendiente.");
+        return;
+      }
+    }
+    String? email = prefs.getString("emailRegistro");
+    String? password = prefs.getString("passwordRegistro");
+    await prefs.setBool("registroPendiente", false);
+
+    showToast(message: "Registrando...");
+    User? user = await _auth.signUpWithEmailAndPassword(email!, password!);
+
+    if (user != null) {
+      showToast(message: "User is successfully created");
+    } else {
+      showToast(message: "Some error happend");
+    }
+
+    await prefs.remove("emailRegistro");
+    await prefs.remove("passwordRegistro");
+    
+  }
+
+  void showToast({required String message}){
+  Fluttertoast.showToast(
+      msg: message,
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.BOTTOM,
+      timeInSecForIosWeb: 1,
+      backgroundColor: Colors.blue,
+      textColor: Colors.white,
+      fontSize: 16.0
+  );
+  }
+
   @override
   Widget build(BuildContext context) {
     // This method is rerun every time setState is called, for instance as done
@@ -75,6 +117,8 @@ class _LoginPageState extends State<LoginPage> {
     // The Flutter framework has been optimized to make rerunning build methods
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
+    
+    
     return Scaffold(
       appBar: AppBar(
         // TRY THIS: Try changing the color here to a specific color (to
@@ -164,7 +208,8 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     const SizedBox(height: 16),
                     ElevatedButton(
-                      onPressed: () {
+                      onPressed: () async {
+                        await checkCache();
                         Navigator.push(
                           context,
                           MaterialPageRoute(builder: (context) =>  HomeScreen()),
