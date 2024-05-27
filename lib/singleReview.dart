@@ -16,15 +16,16 @@ class SingleReview extends StatelessWidget {
         physics: const NeverScrollableScrollPhysics(),
         itemCount: reviews.length,
         itemBuilder: (context, index) {
-          return Card(
+            return Card(
+            color: Color(0xFFFFebc6),
             child: ListTile(
               leading: CircleAvatar(
-                backgroundImage: AssetImage('assets/images/user${Random().nextInt(4) + 1}.png'),
+              backgroundImage: AssetImage('assets/images/user${Random().nextInt(4) + 1}.png'),
               ),
               title: Text(reviews[index].user),
               subtitle: Text(reviews[index].text),
             ),
-          );
+            );
         },
       ),
     );

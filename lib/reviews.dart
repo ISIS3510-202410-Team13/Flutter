@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -38,12 +40,85 @@ class Review{
                             };
                           }
 
+  static Review fromJson(String json) {
+    Map<String, dynamic> data = jsonDecode(json);
+    return Review(
+      restaurant: data['restaurant'],
+      text: data['text'],
+      user: data['user'],
+    );
+  }
+
 }
 
 class _ReviewsState extends State<Reviews> {
 
+  Future<String> get _localPath async {
+    final directory = await getApplicationDocumentsDirectory();
+    return directory.path;
+  }
+
+  Future<File> get _localFile async {
+  final path = await _localPath;
+  return File('$path/restaurants.txt');
+}
+
+Future<File> writeCounter(String data) async {
+  final file = await _localFile;
+
+  return file.writeAsString(data);
+}
+
+hasConnection() async{
+
+    var connectivityResult = await (Connectivity().checkConnectivity());
+    if (connectivityResult == ConnectivityResult.none) {
+      return false;
+    }
+    return true;
+
+  }
+
+Future<List<Review>> readCounter() async {
+  try {
+    final file = await _localFile;
+
+    // Read the file
+    final contents = await file.readAsString();
+
+    List<Review> retornable = [];
+
+    List<dynamic> data = jsonDecode(contents);
+    for (var i = 0; i < data.length; i++) {
+      retornable.add(Review.fromJson(jsonEncode(data[i])));
+    }
+
+    return retornable;
+  }
+  catch (e) {
+    // If encountering an error, return 0
+    return [];
+  }
+}
+
+Future<Widget> getWirget() async{
+  if (await hasConnection()) {
+          return Image.network(
+            widget.url ?? "",
+            width: 200,
+            height: 200,
+          );
+        } else {
+          return Image.asset(
+            'assets/images/image (${Random().nextInt(5) + 1}).png',
+            width: 200,
+            height: 200,
+          );
+        }
+}
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context){
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
@@ -86,10 +161,18 @@ class _ReviewsState extends State<Reviews> {
           ),
         ),
         SizedBox(height: 16),
-        Image.network(
-          widget.url ?? "",
-          width: 200,
-          height: 200,
+
+        FutureBuilder<Widget>(
+          future: getWirget(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return CircularProgressIndicator();
+            }
+            if (snapshot.hasError) {
+              return Text('Error: ${snapshot.error}');
+            }
+            return snapshot.data ?? Container();
+          },
         ),
           
           StreamBuilder<QuerySnapshot>(
@@ -101,11 +184,9 @@ class _ReviewsState extends State<Reviews> {
                             ConnectionState.waiting) {
                           return CircularProgressIndicator(); // Muestra un indicador de carga mientras se cargan los datos
                         }
-                        if (snapshot.hasError) {
-                          return Text(
-                              'Error al obtener los datos: ${snapshot.error}');
-                        }
-                        final List<Review> restaurants =
+                        List<Review> reviews = [];
+                        if (!snapshot.hasError) {
+                          reviews =
                             snapshot.data!.docs.map((doc) {
                           return Review(
                             restaurant: doc['restaurant'],
@@ -113,16 +194,21 @@ class _ReviewsState extends State<Reviews> {
                             user: doc['user'],
                           );
                         }).toList();
+                        }else{
+                          readCounter().then((value) {
+                            reviews = value;
+                          });
+                        }
+                        
                       
                         // Convert the list of restaurants to JSON
-                        final restaurantsJson = jsonEncode(restaurants);
+                        final restaurantsJson = jsonEncode(reviews);
                         
-                        final file = File('restaurants.json');
-                        file.writeAsString(restaurantsJson);
+                        writeCounter(restaurantsJson);
                         // Write the JSON data to a file
 
                         List<Review> filteredRestaurants =
-                            restaurants.where((restaurant) {
+                            reviews.where((restaurant) {
                           bool typeMatch = widget.name == restaurant.restaurant;
                           return typeMatch;
                         }).toList();
