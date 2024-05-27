@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:test_drive/body.dart';
+import 'package:test_drive/bottomnav.dart';
 import 'package:test_drive/user_auth/pages/signup_auth.dart';
 import 'package:test_drive/user_auth/pages/login_auth.dart';
 import 'package:test_drive/global/common/toast.dart';
@@ -102,7 +103,7 @@ void _signInWithEmailAndPassword({required String email, required String passwor
     showToast(message: "User is successfully signed in");
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => HomeScreen()),
+      MaterialPageRoute(builder: (context) => BottomNav()),
     );
   } else {
     showToast(message: "Some error occurred");
@@ -369,7 +370,7 @@ void _signIn() async {
 
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => HomeScreen()),
+      MaterialPageRoute(builder: (context) => BottomNav()),
     );
   } else {
     showToast(message: "Some error occurred");
@@ -397,7 +398,7 @@ void _signIn() async {
         //Navigator.pushNamed(context, "/home");
               Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) =>  HomeScreen()),
+                          MaterialPageRoute(builder: (context) =>  BottomNav()),
                         );
       }
 
