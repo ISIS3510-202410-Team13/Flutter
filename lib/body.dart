@@ -23,31 +23,7 @@ class _HomeScreenState extends State<HomeScreen> {
   FilterOptions selectedFilters = FilterOptions(type: 'ALL', price: '');
 
 
-  final List<Restaurant> restaurants = [
-    Restaurant(
-      name: "Toninos Pasta",
-      imageUrl:
-          "https://images.rappi.com/restaurants_logo/formevfdgfxato-logo-1614191489436.png",
-      description: "Pastas unicas y deliciosas.",
-      lat: 0,
-      long: 0,
-      price: "\$",
-      type: "ALL",
-    ),
-    Restaurant(
-      name: "OneBurrito",
-      imageUrl:
-          "https://images.rappi.com/restaurants_logo/oneburrito-logo-1614191489436.png",
-      description:
-          "Comida mexicana, tacos y burritos, siempre a la orden del dia.",
-      lat: 0,
-      long: 0,
-      price: "\$",
-      type: "ALL",
-
-    ),
-    // Agrega más restaurantes según lo necesites
-  ];
+  final List<Restaurant> restaurants = [];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
