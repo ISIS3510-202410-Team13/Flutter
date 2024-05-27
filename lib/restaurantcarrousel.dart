@@ -2,6 +2,7 @@ import 'dart:collection';
 
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:test_drive/reviews.dart';
 import 'mapView.dart';
 
 
@@ -87,18 +88,36 @@ class RestaurantCarousel extends StatelessWidget {
                     )
                     ),
                     // Botón para ver el restaurante en el mapa
-                    Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: ElevatedButton(
-                        onPressed: () {
-                          // Aquí puedes implementar la navegación al mapa o cualquier acción que desees
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => MapView(lat: restaurant.lat, long: restaurant.long,)),
-                          );
-                        },
-                        child: Text('Ver en el mapa'),
-                      ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: ElevatedButton(
+                            onPressed: () {
+                              // Aquí puedes implementar la navegación al mapa o cualquier acción que desees
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => MapView(lat: restaurant.lat, long: restaurant.long,)),
+                              );
+                            },
+                            child: Text('Ver en el mapa'),
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: ElevatedButton(
+                            onPressed: () {
+                              // Aquí puedes implementar la navegación al mapa o cualquier acción que desees
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => Reviews(name: restaurant.name, url: restaurant.imageUrl)),
+                              );
+                            },
+                            child: Text('Reseñas'),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
