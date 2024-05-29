@@ -150,7 +150,7 @@ setState(() {
       //Navigator.pushNamed(context, "/");
       Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) =>  BottomNav(restaurants: [],)),
+                          MaterialPageRoute(builder: (context) =>  BottomNav(restaurants: [], username: '',)),
                         );
     } else {
       showToast(message: "Some error happend");

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:intl/intl.dart'; // Para formatear fechas
+import 'package:intl/intl.dart';
 import 'dart:convert';
 
 class CouponPage extends StatefulWidget {
@@ -10,15 +10,21 @@ class CouponPage extends StatefulWidget {
 }
 
 class _CouponPageState extends State<CouponPage> {
+  SharedPreferences? _prefs;
+
   @override
   void initState() {
     super.initState();
+    _initializePreferences();
+  }
+
+  Future<void> _initializePreferences() async {
+    _prefs = await SharedPreferences.getInstance();
     _updateCouponCache();
   }
 
   Future<void> _updateCouponCache() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? cachedCoupons = prefs.getString('coupons');
+    String? cachedCoupons = _prefs?.getString('coupons');
 
     if (cachedCoupons != null) {
       List<dynamic> coupons = jsonDecode(cachedCoupons);
@@ -52,7 +58,7 @@ class _CouponPageState extends State<CouponPage> {
         };
       }).toList();
 
-      await prefs.setString('coupons', jsonEncode(coupons));
+      await _prefs?.setString('coupons', jsonEncode(coupons));
       setState(() {});
     });
   }
@@ -115,9 +121,9 @@ class _CouponPageState extends State<CouponPage> {
               style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
             ),
             SizedBox(height: 20),
-            DefaultTabController(
-              length: 2,
-              child: Expanded(
+            Expanded(
+              child: DefaultTabController(
+                length: 2,
                 child: Column(
                   children: <Widget>[
                     TabBar(
@@ -158,16 +164,21 @@ class CouponList extends StatefulWidget {
 
 class _CouponListState extends State<CouponList> {
   List<Map<String, dynamic>> coupons = [];
+  SharedPreferences? _prefs;
 
   @override
   void initState() {
     super.initState();
+    _initializePreferences();
+  }
+
+  Future<void> _initializePreferences() async {
+    _prefs = await SharedPreferences.getInstance();
     _loadCoupons();
   }
 
   Future<void> _loadCoupons() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? cachedCoupons = prefs.getString('coupons');
+    String? cachedCoupons = _prefs?.getString('coupons');
 
     if (cachedCoupons != null) {
       List<dynamic> decodedCoupons = jsonDecode(cachedCoupons);
@@ -229,7 +240,9 @@ class _CouponListState extends State<CouponList> {
               Text("Código QR"),
               SizedBox(height: 10),
               Image.asset(
-                'assets/images/qr-image.jpeg'), // Reemplaza 'assets/qr_code.png' con la ruta de tu imagen de código QR
+                'assets/images/qr-image.jpeg',
+                height: 300, // Adjust the height as per your requirement
+              ),
               SizedBox(height: 10),
               ElevatedButton(
                 onPressed: () {

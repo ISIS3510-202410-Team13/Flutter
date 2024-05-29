@@ -5,7 +5,6 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
-//import 'package:google_map_app/constants.dart';
 import 'package:location/location.dart';
 import 'package:test_drive/location.dart';
 
@@ -28,29 +27,20 @@ class _MapViewState extends State<MapView> {
   LatLng? _center;
   LatLng? currentPosition;
   Map<PolylineId, Polyline> polylines = {};
-
+  StreamSubscription<LocationData>? locationSubscription;
 
   @override
-  void initState()  {
+  void initState() {
     super.initState();
     _center = LatLng(widget.lat, widget.long);
-    //_currentPosition = getUserCurrentLocation();
-    WidgetsBinding.instance
-        .addPostFrameCallback((_) async => await initializeMap());
+    WidgetsBinding.instance.addPostFrameCallback((_) async => await initializeMap());
   }
 
-    Future<void> initializeMap() async {
-     fetchLocationUpdates();
+  Future<void> initializeMap() async {
+    fetchLocationUpdates();
     final coordinates = await fetchPolylinePoints();
     generatePolyLineFromPoints(coordinates);
-
   }
-
-
-
-
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -79,29 +69,27 @@ class _MapViewState extends State<MapView> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Expanded(
-              child: currentPosition== null ?
-              const Center(child: Text("Loading")) : GoogleMap(
-                myLocationEnabled: true,
-                myLocationButtonEnabled: true,
-                initialCameraPosition: CameraPosition(
-                  target: _center!,
-                  zoom: 19.0,
-                ),
-                markers: {
-                  Marker(
-                    markerId: MarkerId("U. De Los Andes"),
-                    position: LatLng(_center!.latitude, _center!.longitude),
-                  ),
-                  Marker(
-                    markerId: MarkerId("currentLocation"),
-                    position: LatLng(currentPosition!.latitude, currentPosition!.longitude),
-                    
-                  ),
-                },
-                polylines: Set<Polyline>.of(polylines.values),
-
-              ),
-              
+              child: currentPosition == null
+                  ? const Center(child: Text("Loading"))
+                  : GoogleMap(
+                      myLocationEnabled: true,
+                      myLocationButtonEnabled: true,
+                      initialCameraPosition: CameraPosition(
+                        target: _center!,
+                        zoom: 19.0,
+                      ),
+                      markers: {
+                        Marker(
+                          markerId: MarkerId("U. De Los Andes"),
+                          position: LatLng(_center!.latitude, _center!.longitude),
+                        ),
+                        Marker(
+                          markerId: MarkerId("currentLocation"),
+                          position: LatLng(currentPosition!.latitude, currentPosition!.longitude),
+                        ),
+                      },
+                      polylines: Set<Polyline>.of(polylines.values),
+                    ),
             ),
           ],
         ),
@@ -114,10 +102,9 @@ class _MapViewState extends State<MapView> {
     PermissionStatus permissionGranted;
 
     serviceEnabled = await locationController.serviceEnabled();
-    if (serviceEnabled) {
+    if (!serviceEnabled) {
       serviceEnabled = await locationController.requestService();
-    } else {
-      return;
+      if (!serviceEnabled) return;
     }
 
     permissionGranted = await locationController.hasPermission();
@@ -128,44 +115,42 @@ class _MapViewState extends State<MapView> {
       }
     }
 
-    locationController.onLocationChanged.listen((currentLocation) {
-      if (currentLocation.latitude != null &&
-          currentLocation.longitude != null) {
-        setState(() {
-          currentPosition = LatLng(
-            currentLocation.latitude!,
-            currentLocation.longitude!,
-          );
-        });
+    locationSubscription = locationController.onLocationChanged.listen((currentLocation) {
+      if (currentLocation.latitude != null && currentLocation.longitude != null) {
+        if (mounted) {
+          setState(() {
+            currentPosition = LatLng(currentLocation.latitude!, currentLocation.longitude!);
+          });
 
-              fetchPolylinePoints().then((coordinates) {
-        generatePolyLineFromPoints(coordinates);
-      });
+          fetchPolylinePoints().then((coordinates) {
+            if (mounted) {
+              generatePolyLineFromPoints(coordinates);
+            }
+          });
+        }
       }
     });
   }
 
-      Future<List<LatLng>> fetchPolylinePoints() async {
+  Future<List<LatLng>> fetchPolylinePoints() async {
     final polylinePoints = PolylinePoints();
 
     final result = await polylinePoints.getRouteBetweenCoordinates(
-      "AIzaSyAl1qbz6VmRsbbc5bbMUZAvUeNWRG9ofic",
+      "AIzaSyAl1qbz6VmRsbbc5bbMUZAvUeNWRG9ofic", // Reemplaza "YOUR_API_KEY" con tu clave de API de Google Maps
       PointLatLng(currentPosition!.latitude, currentPosition!.longitude),
       PointLatLng(widget.lat, widget.long),
+      travelMode: TravelMode.walking, // Especificar el modo de viaje a pie
     );
 
     if (result.points.isNotEmpty) {
-      return result.points
-          .map((point) => LatLng(point.latitude, point.longitude))
-          .toList();
+      return result.points.map((point) => LatLng(point.latitude, point.longitude)).toList();
     } else {
       debugPrint(result.errorMessage);
       return [];
     }
   }
 
-    Future<void> generatePolyLineFromPoints(
-      List<LatLng> polylineCoordinates) async {
+  Future<void> generatePolyLineFromPoints(List<LatLng> polylineCoordinates) async {
     const id = PolylineId('polyline');
 
     final polyline = Polyline(
@@ -175,7 +160,14 @@ class _MapViewState extends State<MapView> {
       width: 5,
     );
 
-    setState(() => polylines[id] = polyline);
-
+    if (mounted) {
+      setState(() => polylines[id] = polyline);
     }
+  }
+
+  @override
+  void dispose() {
+    locationSubscription?.cancel();
+    super.dispose();
+  }
 }

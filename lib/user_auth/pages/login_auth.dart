@@ -44,6 +44,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   void initState() {
     checkCache();
+    checkForBypass();
     super.initState();
   }
 
@@ -59,6 +60,20 @@ class _LoginPageState extends State<LoginPage> {
       userHasTouchId = isUsingBio == 'true';
     });
   }
+
+  void checkForBypass() async{
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool? check = prefs.getBool("isLoggedIn");
+    if(check == null || !check){
+      return;
+    }
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => BottomNav(username: prefs.getString('displayUsername')??"",restaurants: widget.restaurants)),
+    );
+  }
+
 void authenticate() async {
   final canCheck = await auth.canCheckBiometrics;
 
@@ -104,12 +119,14 @@ void _signInWithEmailAndPassword({required String email, required String passwor
   User? user = await _auth.signInWithEmailAndPassword(email, password);
 
   if (user != null) {
-    showToast(message: "User is successfully signed in");
+    await SharedPreferences.getInstance().then((prefs) {
+      prefs.setBool("isLoggedIn", true);
+      prefs.setString("displayUsername", email);
+    });
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => BottomNav(
-        restaurants: widget.restaurants
-      )),
+
+      MaterialPageRoute(builder: (context) => BottomNav(username: email,restaurants: widget.restaurants)),
     );
   } else {
     showToast(message: "Some error occurred");
@@ -117,8 +134,6 @@ void _signInWithEmailAndPassword({required String email, required String passwor
 }
 
   checkCache() async {
-    _auth.signUpWithEmailAndPassword("", "");
-    //showToast(message: "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
     SharedPreferences prefs = await SharedPreferences.getInstance();
     bool? check = prefs.getBool("registroPendiente");
     if (check != null) {
@@ -133,7 +148,6 @@ void _signInWithEmailAndPassword({required String email, required String passwor
 
     if(email == null || email.isEmpty || password == null || password.isEmpty) return;
 
-    //showToast(message: "Registrando...");
     User? user = await _auth.signUpWithEmailAndPassword(email!, password!);
 
     if (user != null) {
@@ -373,11 +387,14 @@ void _signIn() async {
       await storage.write(key: 'email', value: email);
       await storage.write(key: 'password', value: password);
     }
-
+    await SharedPreferences.getInstance().then((prefs) {
+      prefs.setBool("isLoggedIn", true);
+      prefs.setString("displayUsername", email);
+    });
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => BottomNav(        restaurants: widget.restaurants
-)),
+
+      MaterialPageRoute(builder: (context) => BottomNav(username: email,restaurants: widget.restaurants)),
     );
   } else {
     showToast(message: "Some error occurred");
@@ -403,10 +420,14 @@ void _signIn() async {
 
         await _firebaseAuth.signInWithCredential(credential);
         //Navigator.pushNamed(context, "/home");
+        await SharedPreferences.getInstance().then((prefs) {
+          prefs.setBool("isLoggedIn", true);
+          prefs.setString("displayUsername", googleSignInAccount.email);
+        });
               Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) =>  BottomNav(        restaurants: widget.restaurants
-)),
+
+                          MaterialPageRoute(builder: (context) =>  BottomNav(username: googleSignInAccount.email,restaurants: widget.restaurants)),
                         );
       }
 
