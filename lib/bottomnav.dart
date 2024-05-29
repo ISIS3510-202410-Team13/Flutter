@@ -1,13 +1,18 @@
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:test_drive/restaurantcarrousel.dart';
 //import 'package:fooddeliveryapp/pages/home.dart';
 //import 'package:fooddeliveryapp/pages/order.dart';
 //import 'package:fooddeliveryapp/pages/profile.dart';
 //import 'package:fooddeliveryapp/pages/wallet.dart';
+import 'package:test_drive/splash.dart';
 import 'package:test_drive/body.dart';
 import 'package:test_drive/coupon.dart';
 class BottomNav extends StatefulWidget {
-  const BottomNav({super.key});
+  final List<Restaurant> restaurants;
+
+  const BottomNav({super.key, required this.restaurants});
+
 
   @override
   State<BottomNav> createState() => _BottomNavState();
@@ -20,14 +25,16 @@ class _BottomNavState extends State<BottomNav> {
   //late Widget currentPage;
   late HomeScreen homepage;
   late CouponPage couponPage;
+  late SplashScreen splash;
   //late Profile profile;
   //late Order order;
   //late Wallet wallet;
 
   @override
   void initState() {
-    homepage = HomeScreen();
+    homepage = HomeScreen(restaurants: widget.restaurants,);
     couponPage = CouponPage();
+    splash = SplashScreen();
     //order = Order();
     //profile = Profile();
     //wallet = Wallet();

@@ -212,7 +212,7 @@ class _LoginPageState extends State<LoginPage> {
                         await checkCache();
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) =>  HomeScreen()),
+                          MaterialPageRoute(builder: (context) =>  HomeScreen(restaurants: [],)),
                         );
                       },
                       style: ElevatedButton.styleFrom(

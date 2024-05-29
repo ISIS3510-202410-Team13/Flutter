@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:test_drive/body.dart';
+import 'package:test_drive/bottomnav.dart';
 import 'package:test_drive/user_auth/pages/login_auth.dart';
 import 'package:test_drive/global/common/toast.dart';
 
@@ -112,7 +113,7 @@ class _SignUpPageState extends State<SignUpPage> {
                         Navigator.pushAndRemoveUntil(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => LoginPage()),
+                                builder: (context) => LoginPage(restaurants: [],)),
                             (route) => false);
                       },
                       child: Text(
@@ -149,7 +150,7 @@ setState(() {
       //Navigator.pushNamed(context, "/");
       Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) =>  HomeScreen()),
+                          MaterialPageRoute(builder: (context) =>  BottomNav(restaurants: [],)),
                         );
     } else {
       showToast(message: "Some error happend");

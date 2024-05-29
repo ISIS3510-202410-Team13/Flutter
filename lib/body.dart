@@ -13,7 +13,10 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class HomeScreen extends StatefulWidget {
-  HomeScreen({Key? key}) : super(key: key);
+  final List<Restaurant> restaurants;
+
+  //HomeScreen(restaurants, {Key? key, required this.restaurants}) : super(key: key);
+  const HomeScreen({super.key, required this.restaurants});
 
   @override
   _HomeScreenState createState() => _HomeScreenState();
@@ -22,8 +25,6 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   FilterOptions selectedFilters = FilterOptions(type: 'ALL', price: '');
 
-
-  final List<Restaurant> restaurants = [];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -51,9 +52,6 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                   ),
-                  //location(),
-
-                  //itemss(),
                   FilterWidget(
                     onFiltersChanged: (filters) {
                       setState(() {
@@ -64,82 +62,51 @@ class _HomeScreenState extends State<HomeScreen> {
                   titlemenu(
                     text: "Lo más buscado",
                   ),
-                  //nearmeitem(),
-                  StreamBuilder<QuerySnapshot>(
-                      stream: FirebaseFirestore.instance
-                          .collection('restaurants')
-                          .snapshots(),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return CircularProgressIndicator(); // Muestra un indicador de carga mientras se cargan los datos
-                        }
-                        if (snapshot.hasError) {
-                          return Text(
-                              'Error al obtener los datos: ${snapshot.error}');
-                        }
-                        final List<Restaurant> restaurants =
-                            snapshot.data!.docs.map((doc) {
-                          return Restaurant(
-                            name: doc['name'],
-                            imageUrl: doc['url'],
-                            description: doc['description'],
-                            lat: doc['lat'],
-                            long: doc['long'],
-                            price: doc['price'],
-                            type: doc['type'],
-                          );
-                        }).toList();
-                        List<Restaurant> filteredRestaurants =
-                            restaurants.where((restaurant) {
-                          bool typeMatch = selectedFilters.type == 'ALL' ||
-                              restaurant.type == selectedFilters.type;
-                          bool priceMatch = selectedFilters.price.isEmpty ||
-                              restaurant.price == selectedFilters.price;
-                          return typeMatch && priceMatch;
-                        }).toList();
-                        return RestaurantCarousel(restaurants: filteredRestaurants);
-                      }),
+                  RestaurantCarousel(
+                    restaurants: widget.restaurants.where((restaurant) {
+                      bool typeMatch = selectedFilters.type == 'ALL' ||
+                          restaurant.type == selectedFilters.type;
+                      bool priceMatch = selectedFilters.price.isEmpty ||
+                          restaurant.price == selectedFilters.price;
+                      return typeMatch && priceMatch;
+                    }).toList(),
+                  ),
                   titlemenu(
                     text: "Opciones veganas",
                   ),
                   StreamBuilder<QuerySnapshot>(
-                      stream: FirebaseFirestore.instance
-                          .collection('veganrestaurants')
-                          .snapshots(),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return CircularProgressIndicator();
-                        }
-                        if (snapshot.hasError) {
-                          return Text(
-                              'Error al obtener los datos: ${snapshot.error}');
-                        }
-                        final List<Restaurant> restaurants =
-                            snapshot.data!.docs.map((doc) {
-                          return Restaurant(
-                            name: doc['name'],
-                            imageUrl: doc['url'],
-                            description: doc['description'],
-                            lat: 0,
-                            long: 0,
-                            price: "a",
-                            type: "a",
-                          );
-                        }).toList();
-                        List<Restaurant> filteredRestaurants =
-                            restaurants.where((restaurant) {
+                    stream: FirebaseFirestore.instance
+                        .collection('veganrestaurants')
+                        .snapshots(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return CircularProgressIndicator();
+                      }
+                      if (snapshot.hasError) {
+                        return Text('Error al obtener los datos: ${snapshot.error}');
+                      }
+                      final List<Restaurant> restaurants = snapshot.data!.docs.map((doc) {
+                        return Restaurant(
+                          name: doc['name'],
+                          imageUrl: doc['url'],
+                          description: doc['description'],
+                          lat: 0,
+                          long: 0,
+                          price: "a",
+                          type: "a",
+                        );
+                      }).toList();
+                      return RestaurantCarousel(
+                        restaurants: restaurants.where((restaurant) {
                           bool typeMatch = selectedFilters.type == 'ALL' ||
                               restaurant.type == selectedFilters.type;
                           bool priceMatch = selectedFilters.price.isEmpty ||
                               restaurant.price == selectedFilters.price;
                           return typeMatch && priceMatch;
-                        }).toList();
-
-                        return RestaurantCarousel(
-                            restaurants: restaurants);
-                      }),
+                        }).toList(),
+                      );
+                    },
+                  ),
                 ],
               ),
             ),
