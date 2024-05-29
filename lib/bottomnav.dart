@@ -6,8 +6,12 @@ import 'package:flutter/material.dart';
 //import 'package:fooddeliveryapp/pages/wallet.dart';
 import 'package:test_drive/body.dart';
 import 'package:test_drive/coupon.dart';
+import 'package:test_drive/profile.dart';
 class BottomNav extends StatefulWidget {
-  const BottomNav({super.key});
+  const BottomNav({super.key,
+  required this.username});
+
+  final String username;
 
   @override
   State<BottomNav> createState() => _BottomNavState();
@@ -20,7 +24,7 @@ class _BottomNavState extends State<BottomNav> {
   //late Widget currentPage;
   late HomeScreen homepage;
   late CouponPage couponPage;
-  //late Profile profile;
+  late ProfilePage profilePage;
   //late Order order;
   //late Wallet wallet;
 
@@ -28,10 +32,10 @@ class _BottomNavState extends State<BottomNav> {
   void initState() {
     homepage = HomeScreen();
     couponPage = CouponPage();
-    //order = Order();
-    //profile = Profile();
+    //orderPage = OrderPage();
+    profilePage = ProfilePage(user: widget.username);
     //wallet = Wallet();
-    pages = [homepage,couponPage];
+    pages = [homepage,couponPage, profilePage];
     super.initState();
   }
 
@@ -57,10 +61,10 @@ class _BottomNavState extends State<BottomNav> {
               Icons.discount,
               color: Colors.white,
             ),
-            Icon(
-              Icons.wallet_outlined,
-              color: Colors.white,
-            ),
+            //Icon(
+            //  Icons.wallet_outlined,
+            //  color: Colors.white,
+            //),
             Icon(
               Icons.person_outline,
               color: Colors.white,
